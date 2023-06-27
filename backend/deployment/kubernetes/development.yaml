@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-flask
+  namespace: dev
+  labels:
+    app: my-flask
+spec:
+  selector:
+    app: my-flask
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask
+  namespace: dev
+  labels:
+    app: my-flask
+spec:
+  selector:
+    matchLabels:
+      app: my-flask
+  replicas:
+        env:
+        - name: MONGO_URI
+          value: ''
+        - name: SECRET_KEY
+          value: ''
+        - name: STORAGE_PATH
+          value: 'development'
+        ports:
+        - containerPort: 5000

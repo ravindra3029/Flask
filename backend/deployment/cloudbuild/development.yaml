@@ -1,0 +1,59 @@
+steps:
+#Clone from Google Cloud Source Repository  
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone','https://source.developers.google.com/p/${_PROJECT}/r/${_REPO_NAME}']
+
+#Pull image 
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args: ['-c', 'docker pull gcr.io/${_PROJECT}/${_CONTAINERNAME}:latest || exit 0']
+
+#Build image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+            'build',
+            '-t', 'gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}',
+            '-t', 'gcr.io/${_PROJECT}/${_CONTAINERNAME}:latest',
+            '--cache-from', 'gcr.io/${_PROJECT}/${_CONTAINERNAME}:latest',
+            'src/'
+        ]
+
+#Push version-tag-image  
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}']
+  timeout: 900s
+
+#Push latest-tag-image  
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/${_PROJECT}/${_CONTAINERNAME}:latest']
+  timeout: 900s
+
+#k8 deploy
+- name: "gcr.io/cloud-builders/gke-deploy"
+  args:
+  - run
+  - --filename=${_KUBERNETES_CONFIG_FILE}
+  - --image=gcr.io/${_PROJECT}/${_CONTAINERNAME}:latest
+  - --location=${_ZONE}
+  - --cluster=${_GKE_CLUSTER}
+  timeout: 900s
+
+substitutions:
+    #GCP Specific configuration. Please DON'T change anything
+    _PROJECT: My First Project
+    _ZONE: asia-south1-a
+    _GKE_CLUSTER: 
+    _KUBERNETES_CONFIG_FILE: deployment/kubernetes/development.yaml
+    
+    #Repository Specific configuration. DevOps can change this settings
+    _DEPLOYMENTNAME: my-flask
+    _CONTAINERNAME: my-flask
+    _REPO_NAME: github_ravindra3029_Flask
+    
+    # Developers ONLY change
+    _VERSION: v0.1
+    
+options:
+    substitution_option: 'ALLOW_LOOSE'
+
+timeout: 1200s
