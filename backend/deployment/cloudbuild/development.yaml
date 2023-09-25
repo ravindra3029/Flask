@@ -42,7 +42,7 @@ substitutions:
     #Repository Specific configuration. DevOps can change this settings
     _DEPLOYMENTNAME: flask_demo
     _CONTAINERNAME: flask_demo
-    _REPO_NAME: github_ravindra3029_Flask
+    _REPO_NAME: github_ravindra3029_flask
     
     # Developers ONLY change
     _VERSION: dev
