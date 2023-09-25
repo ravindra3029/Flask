@@ -28,7 +28,7 @@ steps:
     - '-c'
     - >
       gcloud compute ssh ${_GCE_VM} --tunnel-through-iap --zone
-      ${_ZONE} --project ${_PROJECT} -- 'cd /home/ubuntu/rtflow/${_DIRECTORY}  && sh docker-run.sh'
+      ${_ZONE} --project ${_PROJECT} -- 'cd /home/ubuntu/demo/${_DIRECTORY}  && sh docker-run.sh'
   entrypoint: /bin/sh
 
 
